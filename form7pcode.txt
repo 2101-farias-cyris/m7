@@ -1,0 +1,27 @@
+DECLARE atomic variable countUpComplete as false
+DECLARE mutex mtx
+
+FUNCTION countUp():
+    FOR i FROM 1 TO 20:
+        SLEEP for 100 milliseconds
+        PRINT "Count Up: " + i
+    END FOR
+    SET countUpComplete to true
+
+FUNCTION countDown():
+    WHILE countUpComplete is false:
+        YIELD control to allow other threads
+    END WHILE
+    FOR i FROM 20 DOWN TO 0:
+        SLEEP for 100 milliseconds
+        PRINT "Count Down:" + i
+    END FOR
+
+FUNCTION main():
+    CREATE thread t1 for countUp function
+    CREATE thread t2 for countDown function
+
+    JOIN t1 to wait for its completion
+    JOIN t2 to wait for its completion
+
+END FUNCTION
